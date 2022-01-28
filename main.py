@@ -44,7 +44,7 @@ def getInput():
         if char == "\x1b":
             return False
 
-        if char == "\r" and (x in all_words or x in answers):
+        if char in ["\r", "\n"] and (x in all_words or x in answers):
             print(f"{ANSI.START_LINE}{ANSI.ERASE_LINE}", end="", flush=True)
             return x
 
@@ -117,5 +117,5 @@ while True:
         print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
     char = getch()
-    if char.lower() in ["\r", "\x1b", "q", "n"]:
+    if char.lower() in ["\x1b", "q", "n"]:
         break
