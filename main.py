@@ -31,8 +31,7 @@ def getInput():
     x = ""
     print(f"_ _ _ _ _{ANSI.START_LINE}", end="", flush=True)
     while True:
-        ch = console.getch()
-        char = ch.decode("utf-8")
+        char = console.getch().decode("utf-8")
         if char == "\x1b":
             return False
 
@@ -108,7 +107,6 @@ while True:
     else:
         print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
-    ch = console.getch()
-    char = ch.decode("utf-8")
-    if ch in [b"\r", b"\x1b"] or char.lower() in ["q", "n"]:
+    char = console.getch().decode("utf-8")
+    if char.lower() in ["\r", "\x1b", "q", "n"]:
         break
