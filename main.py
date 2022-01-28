@@ -48,7 +48,7 @@ def getInput():
             print(f"{ANSI.START_LINE}{ANSI.ERASE_LINE}", end="", flush=True)
             return x
 
-        if char == "\b":
+        if char in ["\b", "\x7f"]:
             if len(x) < 5:
                 print("\b", end="", flush=True)
             x = x[:-1]
@@ -114,7 +114,8 @@ while True:
         if ret == -1:
             tries = 0
     else:
-        print(f"Word was {chosen.upper()}\n")
+        if tries < 5:
+                print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
     char = getch()
     if char.lower() in ["\x1b", "q", "n"]:
