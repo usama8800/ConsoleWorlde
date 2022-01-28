@@ -27,11 +27,20 @@ with open("answers.json", "r") as f:
     answers: List[str] = json.load(f)
 
 
+def getch():
+    ch = console.getch()
+    try:
+        char = ch.decode("utf-8")
+    except AttributeError:
+        char = ch
+    return char
+
+
 def getInput():
     x = ""
     print(f"_ _ _ _ _{ANSI.START_LINE}", end="", flush=True)
     while True:
-        char = console.getch().decode("utf-8")
+        char = getch()
         if char == "\x1b":
             return False
 
@@ -107,6 +116,6 @@ while True:
     else:
         print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
-    char = console.getch().decode("utf-8")
+    char = getch()
     if char.lower() in ["\r", "\x1b", "q", "n"]:
         break
