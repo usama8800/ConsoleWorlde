@@ -1,7 +1,13 @@
 import json
-import msvcrt
+import os
 import random
 from typing import List
+
+# if on windows
+if os.name == "nt":
+    import msvcrt as console
+else:
+    import getch as console
 
 
 class ANSI:
@@ -25,7 +31,7 @@ def getInput():
     x = ""
     print(f"_ _ _ _ _{ANSI.START_LINE}", end="", flush=True)
     while True:
-        ch = msvcrt.getch()
+        ch = console.getch()
         char = ch.decode("utf-8")
         if char == "\x1b":
             return False
@@ -102,7 +108,7 @@ while True:
     else:
         print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
-    ch = msvcrt.getch()
+    ch = console.getch()
     char = ch.decode("utf-8")
     if ch in [b"\r", b"\x1b"] or char.lower() in ["q", "n"]:
         break
