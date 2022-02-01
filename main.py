@@ -15,16 +15,23 @@ class ANSI:
     UNDERLINE = "\x1b[4m"
     GREEN = "\x1b[7;30;42m"
     YELLOW = "\x1b[7;30;43m"
+    GREY = "\x1b[7;30;98m"
     PREV_LINE = "\x1b[F"
+    NEXT_LINE = "\x1b[E"
     ERASE_LINE = "\x1b[K"
     START_LINE = "\x1b[G"
     ERASE_SCREEN = "\x1b[2J\x1b[;H"
+    ERASE_BELOW = "\x1b[J"
 
 
 with open("all_words.json", "r") as f:
     all_words: List[str] = json.load(f)
 with open("answers.json", "r") as f:
     answers: List[str] = json.load(f)
+
+greens = []
+yellows = []
+greys = []
 
 
 def getch():
@@ -36,32 +43,56 @@ def getch():
     return char
 
 
+def printKeyboard():
+    r1 = "qwertyuiop"
+    r2 = "asdfghjkl"
+    r3 = " zxcvbnm"
+    print(ANSI.NEXT_LINE * 2, end="")
+    for i, row in enumerate([r1, r2, r3]):
+        if i > 0:
+            print(" ", end="")
+        for letter in row:
+            if letter in greens:
+                print(ANSI.GREEN, end="")
+            if letter in yellows:
+                print(ANSI.YELLOW, end="")
+            if letter in greys:
+                print(ANSI.GREY, end="")
+            print(letter.upper(), end=" " + ANSI.RESET)
+        print("")
+    print(ANSI.PREV_LINE * 5, end="")
+
+
 def getInput():
     x = ""
-    print(f"_ _ _ _ _{ANSI.START_LINE}", end="", flush=True)
+    print(f"_ _ _ _ _{ANSI.START_LINE}", end="")
+    printKeyboard()
     while True:
+        print("", end="", flush=True)
         char = getch()
         if char == "\x1b":
             return False
 
         if char in ["\r", "\n"] and (x in all_words or x in answers):
-            print(f"{ANSI.START_LINE}{ANSI.ERASE_LINE}", end="", flush=True)
+            print(f"{ANSI.START_LINE}{ANSI.ERASE_BELOW}", end="")
             return x
 
         if char in ["\b", "\x7f"]:
+            if len(x) == 0:
+                continue
             if len(x) < 5:
-                print("\b", end="", flush=True)
+                print("\b", end="")
             x = x[:-1]
-            print(f"\b{ANSI.UNDERLINE} {ANSI.RESET}\b", end="", flush=True)
+            print(f"\b{ANSI.UNDERLINE} {ANSI.RESET}\b", end="")
 
         if len(x) >= 5:
             continue
         if not char.isalpha():
             continue
         x += char
-        print(f"{ANSI.UNDERLINE}{char.upper()}{ANSI.RESET}", end="", flush=True)
+        print(f"{ANSI.UNDERLINE}{char.upper()}{ANSI.RESET}", end="")
         if len(x) < 5:
-            print(" ", end="", flush=True)
+            print(" ", end="")
 
 
 def rateWord(x: str, chosen: str):
@@ -94,6 +125,17 @@ def attempt(chosen: str):
     if x == False:
         return -1
     rates = rateWord(x, chosen)
+    for letter, rate in zip(x, rates):
+        if letter in greens or letter in greys:
+            continue
+        if rate == 1:
+            greens.append(letter)
+            if letter in yellows:
+                yellows.remove(letter)
+        if rate == 0 and letter not in yellows:
+            yellows.append(letter)
+        if rate == -1:
+            greys.append(letter)
     printRatedWord(x, rates)
     if 0 in rates or -1 in rates:
         return 0
@@ -103,6 +145,9 @@ def attempt(chosen: str):
 print(ANSI.ERASE_SCREEN)
 while True:
     print(ANSI.ERASE_SCREEN)
+    greens = []
+    yellows = []
+    greys = []
     chosen = random.choice(answers)
     tries = 6
     while tries > 0:
@@ -113,10 +158,12 @@ while True:
             break
         if ret == -1:
             tries = 0
+            print(ANSI.ERASE_SCREEN)
     else:
         if tries < 5:
-                print(f"Word was {chosen.upper()}\n")
+            print(f"Word was {chosen.upper()}\n")
     print("Press enter to start new game (q/n/esc to quit)")
     char = getch()
     if char.lower() in ["\x1b", "q", "n"]:
+        print(ANSI.ERASE_SCREEN)
         break
