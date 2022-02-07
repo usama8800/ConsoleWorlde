@@ -84,6 +84,7 @@ def getInput():
             ignoreNext = True
             continue
         if char == "\x1b":
+            print(f"{ANSI.START_LINE}{ANSI.ERASE_BELOW}", end="")
             return False
 
         if char in ["\r", "\n"] and (x in all_words or x in answers):
@@ -182,7 +183,6 @@ def main(defaultChosenWord=None):
                 break
             if ret == -1:
                 tries = 0
-                print(ANSI.ERASE_BELOW, end="")
         else:
             if tries < 5:
                 print(f"Word was {chosen.upper()}\n")
