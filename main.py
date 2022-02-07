@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import sys
 from typing import List
 
 # if on windows
@@ -146,28 +147,67 @@ def attempt(chosen: str):
     return 1
 
 
-print(ANSI.ERASE_SCREEN)
-while True:
+def main(defaultChosenWord=None):
+    global greens, yellows, greys
     print(ANSI.ERASE_SCREEN)
-    greens = []
-    yellows = []
-    greys = []
-    chosen = random.choice(answers)
-    tries = 6
-    while tries > 0:
-        tries -= 1
-        ret = attempt(chosen)
-        if ret == 1:
-            print("Correct\n")
-            break
-        if ret == -1:
-            tries = 0
-            print(ANSI.ERASE_SCREEN)
-    else:
-        if tries < 5:
-            print(f"Word was {chosen.upper()}\n")
-    print("Press enter to start new game (q/n/esc to quit)")
-    char = getch()
-    if char.lower() in ["\x1b", "q", "n"]:
+    while True:
         print(ANSI.ERASE_SCREEN)
-        break
+        greens = []
+        yellows = []
+        greys = []
+        if defaultChosenWord:
+            chosen = defaultChosenWord
+        else:
+            chosen = random.choice(answers)
+        tries = 6
+        while tries > 0:
+            tries -= 1
+            ret = attempt(chosen)
+            if ret == 1:
+                print("Correct\n")
+                break
+            if ret == -1:
+                tries = 0
+                print(ANSI.ERASE_BELOW, end="")
+        else:
+            if tries < 5:
+                print(f"Word was {chosen.upper()}\n")
+        print("Press enter to start new game (q/n/esc to quit)")
+        char = getch()
+        if char.lower() in ["\x1b", "q", "n"]:
+            print(ANSI.ERASE_SCREEN)
+            break
+
+
+def test(chosen: str, x: str):
+    rating = rateWord(x, chosen)
+    print(rating)
+    printRatedWord(x, rating)
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    testWord = None
+    chosenWord = None
+    for arg in args:
+        key = arg
+        val = None
+        if arg.startswith("--"):
+            key = arg[2 : arg.index("=")]
+            val = arg[arg.index("=") + 1 :]
+
+        if key == "test":
+            testWord = val
+        elif key == "word":
+            chosenWord = val
+        else:
+            print(f"Unknown argument {key}")
+            exit(1)
+    if testWord is not None and chosenWord is None:
+        print("You must specify a word to test")
+        exit(1)
+
+    if testWord is not None:
+        test(chosenWord, testWord)
+    else:
+        main(chosenWord)
