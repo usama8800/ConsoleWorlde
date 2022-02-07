@@ -34,9 +34,14 @@ greens = []
 yellows = []
 greys = []
 
+# with open("input.txt", "w") as f:
+#     pass
+
 
 def getch():
     ch = console.getch()
+    # with open("input.txt", "a") as f:
+    #     f.write(str(ch) + "\n")
     try:
         char = ch.decode("utf-8")
     except AttributeError:
@@ -68,9 +73,16 @@ def getInput():
     x = ""
     print(f"_ _ _ _ _{ANSI.START_LINE}", end="")
     printKeyboard()
+    ignoreNext = False
     while True:
         print("", end="", flush=True)
         char = getch()
+        if ignoreNext:
+            ignoreNext = False
+            continue
+        if char == "\x00":
+            ignoreNext = True
+            continue
         if char == "\x1b":
             return False
 
