@@ -96,16 +96,20 @@ def getInput():
 
 
 def rateWord(x: str, chosen: str):
-    ret = []
+    ret = [-1] * 5
+    chosen_indices_done = []
     for i, letter in enumerate(x):
-        indices = [j for j, v in enumerate(chosen) if v == letter]
-
-        if i in indices:
-            ret.append(1)
-        elif len(indices) > 0:
-            ret.append(0)
-        else:
-            ret.append(-1)
+        if chosen[i] == letter:
+            ret[i] = 1
+            chosen_indices_done.append(i)
+    for i, letter in enumerate(x):
+        for j, letter1 in enumerate(chosen):
+            if j in chosen_indices_done:
+                continue
+            if letter1 == letter:
+                ret[i] = 0
+                chosen_indices_done.append(j)
+                break
     return ret
 
 
