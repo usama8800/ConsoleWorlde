@@ -104,6 +104,8 @@ def rateWord(x: str, chosen: str):
             ret[i] = 1
             chosen_indices_done.append(i)
     for i, letter in enumerate(x):
+        if ret[i] == 1:
+            continue
         for j, letter1 in enumerate(chosen):
             if j in chosen_indices_done:
                 continue
